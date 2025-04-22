@@ -395,6 +395,10 @@ a:hover {
     border-radius: var(--radius-full);
 }
 
+#contactBtn{
+    z-index: 10000;
+}
+
 /* Theme Toggle */
 .theme-toggle {
     position: fixed !important;
@@ -466,7 +470,7 @@ a:hover {
 
 /* Hero Section */
 .hero-section {
-    min-height: 80vh;
+    min-height: 90vh;
     display: flex;
     align-items: center;
     justify-content: center;

@@ -156,12 +156,15 @@
             </div>
 
             <!-- Form -->
-            <form id="nutritional-assessment-form" class="max-w-4xl mx-auto" action="https://formsubmit.co/mykerchief@gmail.com" method="POST">
+            <form id="nutritional-assessment-form" class="max-w-4xl mx-auto" action="https://formsubmit.co/ajax/mykerchief@gmail.com" method="POST">
                 <!-- Hidden fields for FormSubmit -->
                 <input type="hidden" name="_subject" value="New Nutritional Assessment Submission">
                 <input type="hidden" name="_template" value="table">
                 <input type="hidden" name="_autoresponse" value="Thank you for submitting your nutritional assessment form. Dietitian DevaSena will review your information and reach out with a personalized diet plan.">
-                <!-- IMPORTANT: Replace devasena.diet@example.com with your actual email address -->
+                <input type="hidden" name="_captcha" value="false">
+                <input type="hidden" name="_next" value="https://formsubmit.co/thank-you.html">
+                <input type="text" name="_honey" style="display:none">
+                <!-- FormSubmit configuration complete -->
                 
                 <!-- Form Sections -->
                 <div class="form-section" id="section-1">
@@ -511,7 +514,12 @@
                     
                     <div class="mt-8 flex justify-between">
                         <button type="button" class="prev-btn bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-6 rounded-lg transition shadow-md">Previous</button>
-                        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg transition shadow-md">Submit Assessment</button>
+                        <div>
+                            <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg transition shadow-md">Submit Assessment</button>
+                            <div class="mt-2 text-sm text-gray-500">
+                                <a href="#" id="direct-submit-link" class="text-green-600 hover:underline">Not receiving emails? Click here for direct submission</a>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 

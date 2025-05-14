@@ -330,26 +330,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
-            // For FormSubmit integration with thank you message
-            // This will work with the default form submission
-            const thankYouSection = document.getElementById('thank-you-section');
-            if (thankYouSection) {
-                // Store the form data in localStorage before submission
-                // This allows us to show the thank you message after redirect
-                localStorage.setItem('formSubmitted', 'true');
-                
-                // Let the form submit normally
-                // FormSubmit will handle the email sending
-            }
-            
-            // If you want to handle the submission with JavaScript (AJAX) instead:
-            /*
+            // Use AJAX for FormSubmit to avoid issues with direct HTML file submissions
             e.preventDefault();
             
             // Collect form data
             const formData = new FormData(form);
             
-            // Send data to FormSubmit
+            // Add honeypot field to prevent spam (FormSubmit requirement)
+            formData.append('_honey', '');
+            
+            // Send data to FormSubmit using the AJAX endpoint
             fetch(form.action, {
                 method: 'POST',
                 body: formData,
@@ -357,8 +347,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     'Accept': 'application/json'
                 }
             })
-            .then(response => {
-                if (response.ok) {
+            .then(response => response.json())
+            .then(data => {
+                console.log('FormSubmit response:', data);
+                
+                if (data.success) {
                     // Hide all sections
                     sections.forEach(section => {
                         section.classList.add('hidden');
@@ -371,33 +364,40 @@ document.addEventListener('DOMContentLoaded', function() {
                         thankYouSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     }
                 } else {
-                    throw new Error('Form submission failed');
+                    // If FormSubmit returns an error message
+                    throw new Error(data.message || 'Form submission failed');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('There was a problem submitting your form. Please try again later.');
+                
+                // Check if this might be a first-time submission that needs confirmation
+                const errorMessage = error.message || '';
+                if (errorMessage.includes('confirm') || errorMessage.includes('activation')) {
+                    alert('Please check your email to confirm your FormSubmit account. You may need to activate your email address with FormSubmit before receiving submissions.');
+                } else {
+                    alert('There was a problem submitting your form: ' + error.message);
+                }
             });
-            */
         });
         
-        // Check if form was just submitted (after redirect from FormSubmit)
+        // We're now handling the form submission with AJAX, so we don't need to check localStorage
+        // This code is kept for reference in case we need to revert to the redirect approach
+        /*
         if (localStorage.getItem('formSubmitted') === 'true') {
-            // Clear the flag
             localStorage.removeItem('formSubmitted');
             
-            // Hide all sections
             sections.forEach(section => {
                 section.classList.add('hidden');
             });
             
-            // Show thank you section
             const thankYouSection = document.getElementById('thank-you-section');
             if (thankYouSection) {
                 thankYouSection.classList.remove('hidden');
                 form.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         }
+        */
     }
     
     // Clear form field error on input
@@ -410,4 +410,19 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+    
+    // Direct submission link for fallback
+    const directSubmitLink = document.getElementById('direct-submit-link');
+    if (directSubmitLink && form) {
+        directSubmitLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Change form action to non-AJAX endpoint
+            const currentAction = form.action;
+            form.action = currentAction.replace('/ajax/', '/');
+            
+            // Submit the form directly (will cause page navigation)
+            form.submit();
+        });
+    }
 });

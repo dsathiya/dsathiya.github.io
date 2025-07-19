@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Track daily work and manage teams for mason mestris - Mobile-first construction work tracker">
+    <meta name="keywords" content="mason, mestri, construction, work tracker, team management, daily work log">
+    <meta name="author" content="Mason Mestri Tracker">
+    <title>Mason Mestri Tracker - Construction Work Management</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏗️</text></svg>">
+    <link rel="manifest" href="manifest.json">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Language Selector -->
+    <div class="language-selector">
+        <select id="languageSelect" class="form-select">
+            <option value="en">English</option>
+            <option value="ml">മലയാളം</option>
+            <option value="ta">தமிழ்</option>
+            <option value="hi">हिंदी</option>
+        </select>
+    </div>
+
+    <!-- Login/Registration Screen -->
+    <div id="authScreen" class="screen active">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-6 col-lg-4">
+                    <div class="auth-card">
+                        <div class="text-center mb-4">
+                            <i class="fas fa-hard-hat auth-icon"></i>
+                            <h2 data-translate="app_title">Mason Mestri Tracker</h2>
+                            <p data-translate="app_subtitle">Track your daily work and team</p>
+                        </div>
+
+                        <!-- Login Form -->
+                        <div id="loginForm">
+                            <h4 data-translate="login">Login</h4>
+                            <form id="loginFormElement">
+                                <div class="mb-3">
+                                    <label for="loginMobile" class="form-label" data-translate="mobile_number">Mobile Number</label>
+                                    <input type="tel" class="form-control" id="loginMobile" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="loginPassword" class="form-label" data-translate="password">Password</label>
+                                    <input type="password" class="form-control" id="loginPassword" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100" data-translate="login">Login</button>
+                            </form>
+                            <p class="text-center mt-3">
+                                <span data-translate="no_account">Don't have an account?</span>
+                                <a href="#" id="showRegister" data-translate="register">Register</a>
+                            </p>
+                        </div>
+
+                        <!-- Registration Form -->
+                        <div id="registerForm" style="display: none;">
+                            <h4 data-translate="register">Register</h4>
+                            <form id="registerFormElement">
+                                <div class="mb-3">
+                                    <label for="registerName" class="form-label" data-translate="full_name">Full Name</label>
+                                    <input type="text" class="form-control" id="registerName" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="registerMobile" class="form-label" data-translate="mobile_number">Mobile Number</label>
+                                    <input type="tel" class="form-control" id="registerMobile" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="registerPassword" class="form-label" data-translate="password">Password</label>
+                                    <input type="password" class="form-control" id="registerPassword" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="userRole" class="form-label" data-translate="user_role">User Role</label>
+                                    <select class="form-select" id="userRole" required>
+                                        <option value="admin" data-translate="admin">Admin (Business Owner)</option>
+                                        <option value="worker" data-translate="worker">Worker (Mason Mestri)</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100" data-translate="register">Register</button>
+                            </form>
+                            <p class="text-center mt-3">
+                                <span data-translate="have_account">Already have an account?</span>
+                                <a href="#" id="showLogin" data-translate="login">Login</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div id="dashboardScreen" class="screen">
+        <!-- Navigation -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">
+                    <i class="fas fa-hard-hat me-2"></i>
+                    <span data-translate="app_title">Mason Mestri Tracker</span>
+                </a>
+                <div class="navbar-nav ms-auto">
+                    <span class="navbar-text me-3" id="userWelcome"></span>
+                    <button class="btn btn-outline-light btn-sm" id="logoutBtn" data-translate="logout">Logout</button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="container-fluid mt-3">
+            <!-- Tab Navigation -->
+            <ul class="nav nav-tabs mb-3" id="mainTabs">
+                <li class="nav-item">
+                    <button class="nav-link active" id="sites-tab" data-bs-toggle="tab" data-bs-target="#sites" type="button">
+                        <i class="fas fa-building me-1"></i>
+                        <span data-translate="sites">Sites</span>
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" id="workers-tab" data-bs-toggle="tab" data-bs-target="#workers" type="button">
+                        <i class="fas fa-users me-1"></i>
+                        <span data-translate="workers">Workers</span>
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" id="daily-tab" data-bs-toggle="tab" data-bs-target="#daily" type="button">
+                        <i class="fas fa-calendar-day me-1"></i>
+                        <span data-translate="daily_work">Daily Work</span>
+                    </button>
+                </li>
+                <li class="nav-item" id="analytics-tab-li" style="display: none;">
+                    <button class="nav-link" id="analytics-tab" data-bs-toggle="tab" data-bs-target="#analytics" type="button">
+                        <i class="fas fa-chart-bar me-1"></i>
+                        <span data-translate="analytics">Analytics</span>
+                    </button>
+                </li>
+            </ul>
+
+            <!-- Tab Content -->
+            <div class="tab-content" id="mainTabContent">
+                <!-- Sites Tab -->
+                <div class="tab-pane fade show active" id="sites">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0" data-translate="my_sites">My Sites</h5>
+                                    <button class="btn btn-primary btn-sm" id="addSiteBtn">
+                                        <i class="fas fa-plus me-1"></i>
+                                        <span data-translate="add_site">Add Site</span>
+                                    </button>
+                                </div>
+                                <div class="card-body">
+                                    <div id="sitesList"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card" id="siteFormCard" style="display: none;">
+                                <div class="card-header">
+                                    <h5 class="mb-0" data-translate="site_details">Site Details</h5>
+                                </div>
+                                <div class="card-body">
+                                    <form id="siteForm">
+                                        <input type="hidden" id="siteId">
+                                        <div class="mb-3">
+                                            <label for="siteName" class="form-label" data-translate="site_name">Site Name</label>
+                                            <input type="text" class="form-control" id="siteName" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="siteType" class="form-label" data-translate="site_type">Site Type</label>
+                                            <select class="form-select" id="siteType" required>
+                                                <option value="residential" data-translate="residential">Residential</option>
+                                                <option value="commercial" data-translate="commercial">Commercial</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="siteAddress" class="form-label" data-translate="address">Address</label>
+                                            <textarea class="form-control" id="siteAddress" rows="3" required></textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="siteContact" class="form-label" data-translate="contact_number">Contact Number</label>
+                                            <input type="tel" class="form-control" id="siteContact">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="siteLocation" class="form-label" data-translate="map_location">Map Location (Optional)</label>
+                                            <input type="text" class="form-control" id="siteLocation" placeholder="Latitude, Longitude">
+                                        </div>
+                                        <div class="d-grid gap-2">
+                                            <button type="submit" class="btn btn-primary" data-translate="save">Save</button>
+                                            <button type="button" class="btn btn-secondary" id="cancelSiteBtn" data-translate="cancel">Cancel</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Workers Tab -->
+                <div class="tab-pane fade" id="workers">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0" data-translate="team_members">Team Members</h5>
+                                    <button class="btn btn-primary btn-sm" id="addWorkerBtn">
+                                        <i class="fas fa-plus me-1"></i>
+                                        <span data-translate="add_worker">Add Worker</span>
+                                    </button>
+                                </div>
+                                <div class="card-body">
+                                    <div id="workersList"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card" id="workerFormCard" style="display: none;">
+                                <div class="card-header">
+                                    <h5 class="mb-0" data-translate="worker_details">Worker Details</h5>
+                                </div>
+                                <div class="card-body">
+                                    <form id="workerForm">
+                                        <input type="hidden" id="workerId">
+                                        <div class="mb-3">
+                                            <label for="workerName" class="form-label" data-translate="worker_name">Worker Name</label>
+                                            <input type="text" class="form-control" id="workerName" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="workerMobile" class="form-label" data-translate="mobile_number">Mobile Number</label>
+                                            <input type="tel" class="form-control" id="workerMobile" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="workerType" class="form-label" data-translate="worker_type">Worker Type</label>
+                                            <select class="form-select" id="workerType" required>
+                                                <option value="permanent" data-translate="permanent">Permanent Team Member</option>
+                                                <option value="temporary" data-translate="temporary">Temporary Worker</option>
+                                            </select>
+                                        </div>
+                                        <div class="d-grid gap-2">
+                                            <button type="submit" class="btn btn-primary" data-translate="save">Save</button>
+                                            <button type="button" class="btn btn-secondary" id="cancelWorkerBtn" data-translate="cancel">Cancel</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Daily Work Tab -->
+                <div class="tab-pane fade" id="daily">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0" data-translate="daily_work_log">Daily Work Log</h5>
+                                    <button class="btn btn-primary btn-sm" id="addWorkLogBtn">
+                                        <i class="fas fa-plus me-1"></i>
+                                        <span data-translate="add_work_entry">Add Work Entry</span>
+                                    </button>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <label for="workLogDate" class="form-label" data-translate="date">Date</label>
+                                                <input type="date" class="form-control" id="workLogDate">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label for="workLogSite" class="form-label" data-translate="site">Site</label>
+                                                <select class="form-select" id="workLogSite">
+                                                    <option value="" data-translate="all_sites">All Sites</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label for="workLogWorker" class="form-label" data-translate="worker">Worker</label>
+                                                <select class="form-select" id="workLogWorker">
+                                                    <option value="" data-translate="all_workers">All Workers</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="workLogsList"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card" id="workLogFormCard" style="display: none;">
+                                <div class="card-header">
+                                    <h5 class="mb-0" data-translate="work_entry">Work Entry</h5>
+                                </div>
+                                <div class="card-body">
+                                    <form id="workLogForm">
+                                        <input type="hidden" id="workLogId">
+                                        <div class="mb-3">
+                                            <label for="workLogFormDate" class="form-label" data-translate="date">Date</label>
+                                            <input type="date" class="form-control" id="workLogFormDate" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="workLogFormSite" class="form-label" data-translate="site">Site</label>
+                                            <select class="form-select" id="workLogFormSite" required>
+                                                <option value="" data-translate="select_site">Select Site</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="workLogFormWorker" class="form-label" data-translate="worker">Worker</label>
+                                            <select class="form-select" id="workLogFormWorker" required>
+                                                <option value="" data-translate="select_worker">Select Worker</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="workLogAmount" class="form-label" data-translate="earning_amount">Earning Amount</label>
+                                            <input type="number" class="form-control" id="workLogAmount" step="0.01" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="workLogNotes" class="form-label" data-translate="notes">Notes (Optional)</label>
+                                            <textarea class="form-control" id="workLogNotes" rows="3"></textarea>
+                                        </div>
+                                        <div class="mb-3 form-check">
+                                            <input type="checkbox" class="form-check-input" id="workLogPaid">
+                                            <label class="form-check-label" for="workLogPaid" data-translate="mark_as_paid">Mark as Paid</label>
+                                        </div>
+                                        <div class="d-grid gap-2">
+                                            <button type="submit" class="btn btn-primary" data-translate="save">Save</button>
+                                            <button type="button" class="btn btn-secondary" id="cancelWorkLogBtn" data-translate="cancel">Cancel</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analytics Tab (Admin Only) -->
+                <div class="tab-pane fade" id="analytics">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0" data-translate="earnings_summary">Earnings Summary</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div id="earningsSummary"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0" data-translate="site_activity">Site Activity</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div id="siteActivity"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0" data-translate="regional_trends">Regional Construction Trends</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div id="regionalTrends"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- App JS -->
+    <script src="translations.js"></script>
+    <script src="app.js"></script>
+    <script src="demo-data.js"></script>
+</body>
+</html>

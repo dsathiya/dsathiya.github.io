@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Authentication</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <h1>Authentication Test</h1>
+    <button onclick="testAuth()">Test Authentication</button>
+    <button onclick="loadDemo()">Load Demo Data</button>
+    <button onclick="checkUsers()">Check Users in Storage</button>
+
+    <script>
+        function testAuth() {
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            console.log('Users in storage:', users);
+            
+            if (users.length === 0) {
+                Swal.fire({
+                    title: 'No Users Found',
+                    text: 'Please load demo data first',
+                    icon: 'warning'
+                });
+                return;
+            }
+            
+            const testUser = users.find(u => u.mobile === '9876543210');
+            if (testUser) {
+                Swal.fire({
+                    title: 'User Found!',
+                    text: `Found user: ${testUser.name} (${testUser.role})`,
+                    icon: 'success'
+                });
+            } else {
+                Swal.fire({
+                    title: 'User Not Found',
+                    text: 'Demo user not found in storage',
+                    icon: 'error'
+                });
+            }
+        }
+        
+        function loadDemo() {
+            const demoUsers = [
+                {
+                    id: "demo_admin_1",
+                    name: "Rajesh Kumar",
+                    mobile: "9876543210",
+                    password: "admin123",
+                    role: "admin",
+                    createdAt: "2024-01-01T00:00:00.000Z"
+                },
+                {
+                    id: "demo_worker_1",
+                    name: "Suresh Mestri",
+                    mobile: "9876543211",
+                    password: "worker123",
+                    role: "worker",
+                    createdAt: "2024-01-01T00:00:00.000Z"
+                }
+            ];
+            
+            localStorage.setItem('users', JSON.stringify(demoUsers));
+            
+            Swal.fire({
+                title: 'Demo Data Loaded',
+                text: 'Demo users have been loaded into storage',
+                icon: 'success'
+            });
+        }
+        
+        function checkUsers() {
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            console.log('Current users:', users);
+            
+            Swal.fire({
+                title: 'Users in Storage',
+                html: `<pre>${JSON.stringify(users, null, 2)}</pre>`,
+                icon: 'info'
+            });
+        }
+    </script>
+</body>
+</html>
